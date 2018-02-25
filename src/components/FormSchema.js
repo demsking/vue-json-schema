@@ -15,9 +15,9 @@ export const FormSchema = {
   props: {
     /**
      * The JSON Schema object. Use the `v-if` directive to load asynchronous schema.
-     * @type [Object, Promise]
+     * @type Object
      */
-    schema: { type: [Object, Promise], required: true },
+    schema: { type: Object, required: true },
 
     /**
      * Use this directive to create two-way data bindings with the component. It automatically picks the correct way to update the element based on the input type.
@@ -57,18 +57,15 @@ export const FormSchema = {
     novalidate: { type: Boolean }
   },
   data: () => ({
-    schemaLoaded: {},
     default: {},
     fields: [],
     error: null,
     data: {},
     inputValues: {}
   }),
-  created () {
-    if (this.schema instanceof Promise) {
-      this.schema.then(this.init)
-    } else {
-      this.init(this.schema)
+  computed: {
+    schemaLoaded () {
+      return this.init(this.schema)
     }
   },
   render (createElement) {
@@ -123,12 +120,18 @@ export const FormSchema = {
      * @private
      */
     init (schema) {
-      this.schemaLoaded = schema || {}
+      this.data = {}
+//       this.error = null
+//       this.fields = []
+//       this.default = {}
+//       this.inputValues = {}
 
-      loadFields(this.schemaLoaded, this.fields)
+      loadFields(schema, this.fields)
       initFields(this)
 
       this.data = Object.seal(this.data)
+
+      return schema
     },
 
     /**
